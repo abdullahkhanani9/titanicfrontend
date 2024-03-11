@@ -1,199 +1,114 @@
----
-layout: base
-title: Course Outlines
-image: /images/mario_animation.png
-hide: true
----
-
-<!-- Liquid:  statements -->
-
-<!-- Include submenu from _includes to top of pages -->
-{% include nav_home.html %}
-<!--- Concatenation of site URL to frontmatter image  --->
-{% assign sprite_file = site.baseurl | append: page.image %}
-<!--- Has is a list variable containing mario metadata for sprite --->
-{% assign hash = site.data.mario_metadata %}  
-<!--- Size width/height of Sprit images --->
-{% assign pixels = 256 %} 
-
-<!--- HTML for page contains <p> tag named "Mario" and class properties for a "sprite"  -->
-
-<p id="mario" class="sprite"></p>
-  
-<!--- Embedded Cascading Style Sheet (CSS) rules, 
-        define how HTML elements look 
---->
-<style>
-
-  /*CSS style rules for the id and class of the sprite...
-  */
-  .sprite {
-    height: {{pixels}}px;
-    width: {{pixels}}px;
-    background-image: url('{{sprite_file}}');
-    background-repeat: no-repeat;
-  }
-
-  /*background position of sprite element
-  */
-  #mario {
-    background-position: calc({{animations[0].col}} * {{pixels}} * -1px) calc({{animations[0].row}} * {{pixels}}* -1px);
-  }
-</style>
-
-<!--- Embedded executable code--->
-<script>
-  ////////// convert YML hash to javascript key:value objects /////////
-
-  var mario_metadata = {}; //key, value object
-  {% for key in hash %}  
-  
-  var key = "{{key | first}}"  //key
-  var values = {} //values object
-  values["row"] = {{key.row}}
-  values["col"] = {{key.col}}
-  values["frames"] = {{key.frames}}
-  mario_metadata[key] = values; //key with values added
-
-  {% endfor %}
-
-  ////////// game object for player /////////
-
-  class Mario {
-    constructor(meta_data) {
-      this.tID = null;  //capture setInterval() task ID
-      this.positionX = 0;  // current position of sprite in X direction
-      this.currentSpeed = 0;
-      this.marioElement = document.getElementById("mario"); //HTML element of sprite
-      this.pixels = {{pixels}}; //pixel offset of images in the sprite, set by liquid constant
-      this.interval = 100; //animation time interval
-      this.obj = meta_data;
-      this.marioElement.style.position = "absolute";
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Estates - House Price Prediction</title>
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background-color: #f5f5f5;
     }
 
-    animate(obj, speed) {
-      let frame = 0;
-      const row = obj.row * this.pixels;
-      this.currentSpeed = speed;
-
-      this.tID = setInterval(() => {
-        const col = (frame + obj.col) * this.pixels;
-        this.marioElement.style.backgroundPosition = `-${col}px -${row}px`;
-        this.marioElement.style.left = `${this.positionX}px`;
-
-        this.positionX += speed;
-        frame = (frame + 1) % obj.frames;
-
-        const viewportWidth = window.innerWidth;
-        if (this.positionX > viewportWidth - this.pixels) {
-          document.documentElement.scrollLeft = this.positionX - viewportWidth + this.pixels;
-        }
-      }, this.interval);
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f1e7; /* Light Brown */
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    startWalking() {
-      this.stopAnimate();
-      this.animate(this.obj["Walk"], 3);
+    h1, h2 {
+      color: #205b40; /* Pine Green */
     }
 
-    startRunning() {
-      this.stopAnimate();
-      this.animate(this.obj["Run1"], 6);
+    form {
+      margin-bottom: 20px;
     }
 
-    startPuffing() {
-      this.stopAnimate();
-      this.animate(this.obj["Puff"], 0);
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #205b40; /* Pine Green */
     }
 
-    startCheering() {
-      this.stopAnimate();
-      this.animate(this.obj["Cheer"], 0);
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
 
-    startFlipping() {
-      this.stopAnimate();
-      this.animate(this.obj["Flip"], 0);
+    button {
+      padding: 10px 20px;
+      background-color: #205b40; /* Pine Green */
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
-    startResting() {
-      this.stopAnimate();
-      this.animate(this.obj["Rest"], 0);
+    button:hover {
+      background-color: #18412c; /* Darker Pine Green */
     }
 
-    stopAnimate() {
-      clearInterval(this.tID);
+    #result {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Elite Estates - House Price Prediction</h1>
+    <form id="predictionForm">
+      <label for="area">Area (in square feet):</label>
+      <input type="number" id="area" name="area" required>
 
-  const mario = new Mario(mario_metadata);
+      <label for="bedrooms">Number of bedrooms:</label>
+      <input type="number" id="bedrooms" name="bedrooms" required>
 
-  ////////// event control /////////
+      <label for="bathrooms">Number of bathrooms:</label>
+      <input type="number" id="bathrooms" name="bathrooms" required>
 
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowRight") {
+      <label for="age">Age of the house (in years):</label>
+      <input type="number" id="age" name="age" required>
+
+      <button type="submit">Predict Price</button>
+    </form>
+
+    <div id="result" style="display: none;">
+      <h2>Predicted House Price:</h2>
+      <p id="predictedPrice"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('predictionForm').addEventListener('submit', function(event) {
       event.preventDefault();
-      if (event.repeat) {
-        mario.startCheering();
-      } else {
-        if (mario.currentSpeed === 0) {
-          mario.startWalking();
-        } else if (mario.currentSpeed === 3) {
-          mario.startRunning();
-        }
-      }
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      if (event.repeat) {
-        mario.stopAnimate();
-      } else {
-        mario.startPuffing();
-      }
+
+      // Get form values
+      const area = parseFloat(document.getElementById('area').value);
+      const bedrooms = parseInt(document.getElementById('bedrooms').value);
+      const bathrooms = parseInt(document.getElementById('bathrooms').value);
+      const age = parseInt(document.getElementById('age').value);
+
+      // Perform prediction (You'll need to replace this with your actual prediction logic)
+      const predictedPrice = predictPrice(area, bedrooms, bathrooms, age);
+
+      // Display result
+      document.getElementById('predictedPrice').textContent = `$${predictedPrice}`;
+      document.getElementById('result').style.display = 'block';
+    });
+
+    // Dummy prediction function (Replace this with your actual prediction logic)
+    function predictPrice(area, bedrooms, bathrooms, age) {
+      // Dummy calculation for demonstration purposes
+      return (area * 100) + (bedrooms * 5000) + (bathrooms * 3000) - (age * 1000);
     }
-  });
-
-  //touch events that enable animations
-  window.addEventListener("touchstart", (event) => {
-    event.preventDefault(); // prevent default browser action
-    if (event.touches[0].clientX > window.innerWidth / 2) {
-      // move right
-      if (currentSpeed === 0) { // if at rest, go to walking
-        mario.startWalking();
-      } else if (currentSpeed === 3) { // if walking, go to running
-        mario.startRunning();
-      }
-    } else {
-      // move left
-      mario.startPuffing();
-    }
-  });
-
-  //stop animation on window blur
-  window.addEventListener("blur", () => {
-    mario.stopAnimate();
-  });
-
-  //start animation on window focus
-  window.addEventListener("focus", () => {
-     mario.startFlipping();
-  });
-
-  //start animation on page load or page refresh
-  document.addEventListener("DOMContentLoaded", () => {
-    // adjust sprite size for high pixel density devices
-    const scale = window.devicePixelRatio;
-    const sprite = document.querySelector(".sprite");
-    sprite.style.transform = `scale(${0.2 * scale})`;
-    mario.startResting();
-  });
-
-</script>
-Investing in Your Technical Future
-
-Explore the Computer Science Pathway at Del Norte High School. All Del Norte CompSci classes are designed to provide a real-world development experience. Grading is focused on time invested, analytics, participation with peers, and engagement in learning.
-
-- Project-based learning with teacher support
-- Tech Talks by teacher complimented with Student Teaching
-- Course learning includes Coding Languages, DevOps, GitHub, Research and Creativity
-- Student teams practice Agile Development Methodologies: planning, communication, collaboration
-- Class lab time provided and approximately 2-3 hours of homework per week
+  </script>
+</body>
+</html>
